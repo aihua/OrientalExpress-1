@@ -14,7 +14,8 @@ OrientalExpress项目是由上海证券交易所技术人员主导的一个开�
 【接口使用说明】  
 ================
 
-具体使用方法请参见接口头文件注释 source/app/src/sse/ngts/ezexpress/app/ExpressApi.java \n客户端演示用例请参见 source/demo/src/sse/ngts/ezexpress/demo/tcp/TCPClient.java（TCP）、
+具体使用方法请参见接口头文件注释 source/app/src/sse/ngts/ezexpress/app/ExpressApi.java 。
+客户端演示用例请参见 source/demo/src/sse/ngts/ezexpress/demo/tcp/TCPClient.java（TCP）、
 source/demo/src/sse/ngts/ezexpress/demo/udp/UDPMulticastClient.java（UDP多播）和 source/demo/src/sse/ngts/ezexpress/demo/udp/UDPUnicastClient.java（UDP单点）
 
 【联系方式】

@@ -1,6 +1,6 @@
 /*########################################################################
  *#                                                                      #
- *#                      Copyright (c) 2012 by                           #
+ *#                      Copyright (c) 2014 by                           #
  *#          Shanghai Stock Exchange (SSE), Shanghai, China              #
  *#                       All rights reserved.                           #
  *#                                                                      #
@@ -20,6 +20,7 @@ import sse.ngts.common.plugin.step.field.TargetCompID;
 import sse.ngts.common.plugin.step.field.TotNoRelatedSym;
 import sse.ngts.common.plugin.step.field.TradSesMode;
 import sse.ngts.common.plugin.step.field.TradSesStatus;
+import sse.ngts.common.plugin.step.field.TradingSessionID;
 
 public class MarketStatus extends Message {
 	private static final long serialVersionUID = -3545556332993174766L;
@@ -219,6 +220,29 @@ public class MarketStatus extends Message {
 		return isSetField(TradSesStatus.FIELD);
 	}
 
+	public void set(TradingSessionID value) {
+		setField(value);
+	}
+
+	public TradingSessionID get(TradingSessionID value) throws FieldNotFound {
+		getField(value);
+		return value;
+	}
+
+	public TradingSessionID getTradingSessionID() throws FieldNotFound {
+		TradingSessionID value = new TradingSessionID();
+		getField(value);
+		return value;
+	}
+
+	public boolean isSet(TradingSessionID field) {
+		return isSetField(field);
+	}
+
+	public boolean isSetTradingSessionID() {
+		return isSetField(TradingSessionID.FIELD);
+	}
+
 	public void set(TotNoRelatedSym value) {
 		setField(value);
 	}
@@ -241,5 +265,51 @@ public class MarketStatus extends Message {
 	public boolean isSetTotNoRelatedSym() {
 		return isSetField(TotNoRelatedSym.FIELD);
 	}
+	
+	/*public void set(PossDupFlag value) {
+		setField(value);
+	}
+	
+	public PossDupFlag get(PossDupFlag value) throws FieldNotFound {
+		getField(value);
+		return value;
+	}
+	
+	public PossDupFlag getPossDupFlag() throws FieldNotFound {
+		PossDupFlag value = new PossDupFlag();
+		getField(value);
+		return value;
+	}
+	
+	public boolean isSet(PossDupFlag field) {
+		return isSetField(field);
+	}
+	
+	public boolean isSetPossDupFlag() {
+		return isSetField(PossDupFlag.FIELD);
+	}
+	
+	public void set(PossResend value) {
+		setField(value);
+	}
+	
+	public PossResend get(PossResend value) throws FieldNotFound {
+		getField(value);
+		return value;
+	}
+	
+	public PossResend getPossResend() throws FieldNotFound {
+		PossResend value = new PossResend();
+		getField(value);
+		return value;
+	}
+	
+	public boolean isSet(PossResend field) {
+		return isSetField(field);
+	}
+	
+	public boolean isSetPossResend() {
+		return isSetField(PossResend.FIELD);
+	}*/
+	
 }
-

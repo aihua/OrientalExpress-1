@@ -14,6 +14,7 @@ import sse.ngts.common.plugin.step.IncorrectTagValue;
 import sse.ngts.common.plugin.step.InvalidMessage;
 import sse.ngts.common.plugin.step.Message;
 import sse.ngts.common.plugin.step.STEPParser;
+import sse.ngts.common.plugin.step.business.MarketStatus;
 import sse.ngts.common.plugin.step.business.MktDataBody;
 import sse.ngts.common.plugin.step.business.MktDataFull;
 import sse.ngts.ezexpress.app.config.ParserConfig;
@@ -23,9 +24,10 @@ public class FastParser {
 	private static Logger log = Logger.getLogger(FastParser.class);
 
 	private static final String rawDataTag = "96=";
+	private static final String totNoRelatedSymTag = "393=";
 	private static final String checkSumTag = "10=";
 
-	public static FastMessageExpress parseHeader(byte[] inBytes) {
+	public static FastMessageExpress parseMarketData(byte[] inBytes) {
 		int rawDataOffset = 0, checkSumOffset = 0;
 		try {
 			rawDataOffset = ByteArrayBuffer.fixByteOffset(inBytes, rawDataTag.getBytes("US-ASCII"));
@@ -33,19 +35,20 @@ public class FastParser {
 		} catch (Exception e) {
 			throw new IllegalArgumentException("UnSupport Charset");
 		}
-		if (rawDataOffset < 0 || checkSumOffset < 0) {
+
+		if (checkSumOffset < 0 || rawDataOffset < 0) {
 			throw new IllegalArgumentException("STEP Data Format Incorrect");
 		}
 
+		byte[] fixbyte = null;
 		byte[] fixbody = ByteArrayBuffer.toByteArray(inBytes, 0, rawDataOffset);
 		byte[] fixend = ByteArrayBuffer.toByteArray(inBytes, checkSumOffset, 8);
-		byte[] fixbyte = new byte[fixbody.length + fixend.length];
-
+		fixbyte = new byte[fixbody.length + fixend.length];
 		System.arraycopy(fixbody, 0, fixbyte, 0, fixbody.length);
 		System.arraycopy(fixend, 0, fixbyte, fixbody.length, fixend.length);
 
 		//加载Step头信息
-		MktDataFull mktDataFull = parseFixMessage(fixbyte);
+		MktDataFull mktDataFull = (MktDataFull) parseFixMessage(fixbyte);
 
 		if (mktDataFull != null) {
 			try {
@@ -65,13 +68,32 @@ public class FastParser {
 		}
 		return null;
 	}
+	
+	public static MarketStatus parseMarketStatus(byte[] inBytes) {
+		int totNoRelatedSymOffset = 0, checkSumOffset = 0;
+		try {
+			totNoRelatedSymOffset = ByteArrayBuffer.fixByteOffset(inBytes, totNoRelatedSymTag.getBytes("US-ASCII"));
+			checkSumOffset = ByteArrayBuffer.fixByteLastOffset(inBytes, checkSumTag.getBytes("US-ASCII"));
+		} catch (Exception e) {
+			throw new IllegalArgumentException("UnSupport Charset");
+		}
+		
+		if (checkSumOffset < 0 || totNoRelatedSymOffset < 0) {
+			throw new IllegalArgumentException("STEP Data Format Incorrect");
+		}
+		
+		//加载Step头信息
+		MarketStatus marketStatus = (MarketStatus) parseFixMessage(inBytes);
+			
+		return marketStatus;
+	}
 
 	/**
 	 * 用Step协议解析头信息 
 	 * @param fixMessage
 	 * @return
 	 */
-	private static MktDataFull parseFixMessage(byte[] fixMessage) {
+	private static Message parseFixMessage(byte[] fixMessage) {
 		String fixMsg = new String(fixMessage);
 		Message msg = null;
 		STEPParser app = null;
@@ -87,19 +109,13 @@ public class FastParser {
 		} catch (IncorrectDataFormat e) {
 			throw new IllegalArgumentException(e.getMessage());
 		}
-		if (msg instanceof MktDataFull) {
-			return (MktDataFull) msg;
-		}
-		return null;
+		return msg;
 	}
 
 	private static List<MktDataBody> parseFastMessage(String securityType, int mdCount, byte[] fastMessage) {
 		FastDecoder decoder = null;
 
-		byte[] buffer = new byte[128 * 1024];
-		System.arraycopy(fastMessage, 0, buffer, 0, fastMessage.length);
-
-		ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
+		ByteArrayInputStream bais = new ByteArrayInputStream(fastMessage);
 		decoder = new FastDecoder(ParserConfig.getInstance().getMarketDataContext(securityType), bais);
 
 		List<MktDataBody> messages = new ArrayList<MktDataBody>();
@@ -110,10 +126,10 @@ public class FastParser {
 				messages.add(new MktDataBody(message));
 			}
 		}
-		
+
 		decoder.reset();
-		
+
 		return messages;
 	}
-	
+
 }

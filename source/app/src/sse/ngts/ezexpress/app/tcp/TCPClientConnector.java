@@ -48,10 +48,11 @@ public class TCPClientConnector extends ClientConnector {
 		if (connector == null) {
 			connector = new NioSocketConnector();
 			//设置缓存大小
-			connector.getSessionConfig().setMaxReadBufferSize(2048);
+			connector.getSessionConfig().setMaxReadBufferSize(ExpressConstant.MAX_PACKAGESIE);
+			connector.getSessionConfig().setTcpNoDelay(true);
 			// 添加过滤器
 			connector.getFilterChain().addLast("codec",
-					new ProtocolCodecFilter(new ExpressCodecFactory(Charset.forName("UTF-8"))));
+					new ProtocolCodecFilter(new ExpressCodecFactory(Charset.forName(ExpressConstant.DECODE_CHARSET))));
 			
 			//设置日志过滤器
 			LoggingFilter loggingFilter = new LoggingFilter();

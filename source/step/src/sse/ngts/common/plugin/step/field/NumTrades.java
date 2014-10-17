@@ -1,6 +1,6 @@
 /*########################################################################
  *#                                                                      #
- *#                      Copyright (c) 2012 by                           #
+ *#                      Copyright (c) 2014 by                           #
  *#          Shanghai Stock Exchange (SSE), Shanghai, China              #
  *#                       All rights reserved.                           #
  *#                                                                      #
@@ -26,4 +26,3 @@ public class NumTrades extends IntField{
 		super(FIELD, data);
 	}
 }
-

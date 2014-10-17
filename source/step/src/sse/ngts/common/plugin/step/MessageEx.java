@@ -1,6 +1,6 @@
 /*########################################################################
  *#                                                                      #
- *#                      Copyright (c) 2012 by                           #
+ *#                      Copyright (c) 2014 by                           #
  *#          Shanghai Stock Exchange (SSE), Shanghai, China              #
  *#                       All rights reserved.                           #
  *#                                                                      #
@@ -18,14 +18,15 @@ import sse.ngts.common.plugin.step.field.CheckSum;
 import sse.ngts.common.plugin.step.field.MessageEncoding;
 import sse.ngts.common.plugin.step.field.MsgSeqNum;
 import sse.ngts.common.plugin.step.field.MsgType;
+import sse.ngts.common.plugin.step.field.PossDupFlag;
 import sse.ngts.common.plugin.step.field.SenderCompID;
 import sse.ngts.common.plugin.step.field.SendingTime;
 import sse.ngts.common.plugin.step.field.TargetCompID;
 
 public class MessageEx extends Message {
 	private static final long serialVersionUID = 5820958609658175416L;
-	public static int MSGSEQNUM = 1;
-	private final String senderCompID = "EzSR";
+	private final String beginString = "FIXT.1.1";
+	private final String senderCompID = "EzExpress";
 	private final String targetCompID = "EzEI";
 	private final String messageEncoding = "GBK";
 	protected Header header = new Header();
@@ -39,19 +40,19 @@ public class MessageEx extends Message {
 		super(fieldOrder);
 	}
 
-	public void setMsgType(MsgType msgType) {
-		setHeader(msgType);
+	public void setMsgType(MsgType msgType, long sendMsgSeqNum) {
+		setHeader(msgType, sendMsgSeqNum);
 	}
 
-	private void setHeader(MsgType msgType) {
+	private void setHeader(MsgType msgType, long sendMsgSeqNum) {
 		header.setField(msgType);
-		SimpleDateFormat sdf = new SimpleDateFormat("HHmmssSSS");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HH:mm:ss.SSS");
 		String sendTime = sdf.format(new java.util.Date());
-		sendTime = sendTime.substring(0, 8);
-		header.setField(new BeginString("STEP.1.0.0"));
+		sendTime = sendTime.substring(0, 21);
+		header.setField(new BeginString(beginString));
 		header.setField(new SenderCompID(senderCompID));
 		header.setField(new TargetCompID(targetCompID));
-		header.setField(new MsgSeqNum(MSGSEQNUM++));
+		header.setField(new MsgSeqNum(sendMsgSeqNum));
 		header.setField(new SendingTime(sendTime));
 		header.setField(new MessageEncoding(messageEncoding));
 	}
@@ -83,7 +84,8 @@ public class MessageEx extends Message {
 	public static class Header extends FieldMap {
 		static final long serialVersionUID = -3193357271891865972L;
 		private static final int[] EXCLUDED_HEADER_FIELDS = { BeginString.FIELD, BodyLength.FIELD, MsgType.FIELD,
-				SenderCompID.FIELD, TargetCompID.FIELD, MsgSeqNum.FIELD, SendingTime.FIELD, MessageEncoding.FIELD };
+				SenderCompID.FIELD, TargetCompID.FIELD, MsgSeqNum.FIELD, SendingTime.FIELD, MessageEncoding.FIELD,
+				PossDupFlag.FIELD, PossDupFlag.FIELD};
 
 		@Override
 		protected void calculateString(StringBuffer buffer, int[] excludedFields, int[] postFields) {

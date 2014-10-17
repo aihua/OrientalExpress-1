@@ -10,6 +10,7 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import sse.ngts.common.plugin.step.Message;
 import sse.ngts.common.plugin.step.MessageUtils;
 import sse.ngts.common.plugin.step.STEPParser;
+import sse.ngts.common.plugin.step.business.MarketStatus;
 import sse.ngts.ezexpress.app.ExpressConstant;
 import sse.ngts.ezexpress.app.config.ParserConfig;
 import sse.ngts.ezexpress.util.ExpressUtil;
@@ -21,7 +22,7 @@ public class StepProtocalDecoder extends CumulativeProtocolDecoder {
 
 	private Charset charset;
 	private int totalLengthWithoutBody;//没有body的总长度
-	private int afterBeginStrMinLength;//在"8=STEP.1.0.0"之后需要的最小长度：不包括body
+	private int afterBeginStrMinLength;//在"8=FIXT.1.1"之后需要的最小长度：不包括body
 	
 	public StepProtocalDecoder(Charset charset) {
 		this.charset = charset;
@@ -42,7 +43,7 @@ public class StepProtocalDecoder extends CumulativeProtocolDecoder {
 			
 			/**
 			 * 例如此时缓存中的step消息：
-			 * 8=STEP.1.0.09=6935=A49=EzEI56=EzSR34=152=14281829347=GBK98=0108=20553=11111110=134
+			 * 8=FIXT.1.19=6935=A49=EzEI56=EzSR34=152=14281829347=GBK98=0108=20553=11111110=134
 			 */
 			byte[] beginLengthByte = new byte[ExpressConstant.BEGINSTRING_LENGTH_NOT_SPLIT];
 			try {
@@ -56,7 +57,7 @@ public class StepProtocalDecoder extends CumulativeProtocolDecoder {
 				break;
 			}			
 			
-			in.position(position);//移动position到"8=STEP.1.0.0"之后
+			in.position(position);//移动position到"8=FIXT.1.1"之后
 			if (in.remaining() < afterBeginStrMinLength) {
 				break;
 			}
@@ -66,7 +67,7 @@ public class StepProtocalDecoder extends CumulativeProtocolDecoder {
 				bodyLengthByteLen++;
 			}
 			
-			//因为while循环中取出bodylength，此处重置position到"8=STEP.1.0.0"之后
+			//因为while循环中取出bodylength，此处重置position到"8=FIXT.1.1"之后
 			in.position(position);
 			byte[] bodyLengthByte = new byte[bodyLengthByteLen];
 			in.get(bodyLengthByte);//取得消息体长度的byte
@@ -87,7 +88,7 @@ public class StepProtocalDecoder extends CumulativeProtocolDecoder {
 			
 			/**
 			 * 算出一条完整的step消息的总长度
-			 * BEGINSTRING_LENGTH："8=STEP.1.0.09="
+			 * BEGINSTRING_LENGTH："8=FIXT.1.19="
 			 * bodyLength："69"
 			 * PARTITION_BYTE_LENGTH：""
 			 * bodyLength："35=A49=EzEI56=EzSR34=152=14281829347=GBK98=0108=20553=111111"
@@ -103,13 +104,16 @@ public class StepProtocalDecoder extends CumulativeProtocolDecoder {
 			
 			String messageData = ExpressUtil.byteToString(charset, totalLengthByte);
 			final String msgType = MessageUtils.getMessageType(messageData);
-			if (!ExpressConstant.STEP_MSGTYPE_MARKET_DATA.equals(msgType)) {
+			if (ExpressConstant.STEP_MSGTYPE_MARKET_DATA.equals(msgType)) {
+				FastMessageExpress messages = FastParser.parseMarketData(totalLengthByte);
+				out.write(messages);
+			} else if (ExpressConstant.STEP_MSGTYPE_MARKET_STATUS_DATA.equals(msgType)) {
+				MarketStatus messages = FastParser.parseMarketStatus(totalLengthByte);
+				out.write(messages);
+			} else  {
 				STEPParser app = ParserConfig.getInstance().getStep();
 				Message message = app.parseMessage(messageData);
 				out.write(message);
-			} else {
-				FastMessageExpress messages = FastParser.parseHeader(totalLengthByte);
-				out.write(messages);
 			}
 			position = position + totalLength;
 		}

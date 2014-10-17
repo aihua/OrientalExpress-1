@@ -1,6 +1,6 @@
 /*########################################################################
  *#                                                                      #
- *#                      Copyright (c) 2012 by                           #
+ *#                      Copyright (c) 2014 by                           #
  *#          Shanghai Stock Exchange (SSE), Shanghai, China              #
  *#                       All rights reserved.                           #
  *#                                                                      #
@@ -26,13 +26,13 @@ public class MarketDataRequest extends MessageEx {
 
 	public MarketDataRequest() {
 		super();
-		setMsgType(new MsgType(MSGTYPE));
+		setMsgType(new MsgType(MSGTYPE), 1);
 		getHeader().setField(new MsgType(MSGTYPE));
 	}
 
-	public MarketDataRequest(int[] fieldOrder) {
+	public MarketDataRequest(int[] fieldOrder, long sendMsgSeqNum) {
 		super(fieldOrder);
-		setMsgType(new MsgType(MSGTYPE));
+		setMsgType(new MsgType(MSGTYPE), sendMsgSeqNum);
 		getHeader().setField(new MsgType(MSGTYPE));
 	}
 

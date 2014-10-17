@@ -1,6 +1,6 @@
 /*########################################################################
  *#                                                                      #
- *#                      Copyright (c) 2012 by                           #
+ *#                      Copyright (c) 2014 by                           #
  *#          Shanghai Stock Exchange (SSE), Shanghai, China              #
  *#                       All rights reserved.                           #
  *#                                                                      #
@@ -91,6 +91,7 @@ public class PartyRole extends IntField {
 	public static final int MARKET_DATA_MARKET = 77;
 	public static final int ALLOCATION_ENTITY = 78;
 	public static final int BUSINESS_DEPARTMENT = 4001;
+	public static final int SUB_INVESTOR_ID = 500;
 
 	public PartyRole() {
 		super(452);

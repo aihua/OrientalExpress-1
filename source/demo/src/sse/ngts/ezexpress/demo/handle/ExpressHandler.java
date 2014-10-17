@@ -7,7 +7,9 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 
+import sse.ngts.common.plugin.step.business.MarketStatus;
 import sse.ngts.common.plugin.step.business.MktDataBody;
+import sse.ngts.common.plugin.step.field.MsgSeqNum;
 import sse.ngts.ezexpress.app.codec.FastMessageExpress;
 
 /**
@@ -36,13 +38,19 @@ public class ExpressHandler extends IoHandlerAdapter {
 	@Override
 	public void messageReceived(IoSession session, Object message) throws Exception {
 		if (message instanceof FastMessageExpress) {
+			log.debug("收到行情step：" + message.toString());
 			FastMessageExpress fme = (FastMessageExpress)message;
-			log.debug("收到行情的证券类型：" + fme.getMktDataFull().getSecurityType().getValue());
+		
 			List<MktDataBody> mktDatas = fme.getmktDataBody();
 			for (MktDataBody mktDataBody : mktDatas) {
 				log.debug("收到行情的证券代码：" + mktDataBody.getSecurityID());
 			}
+		} else if (message instanceof MarketStatus) {
+			log.debug("收到市场状态step：" + message.toString());
+			MarketStatus fme = (MarketStatus)message;
+			log.debug("收到行情的市场状态:" + fme.getTradingSessionID().getValue());
 		}
+
 	}
 
 	@Override

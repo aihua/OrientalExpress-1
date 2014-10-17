@@ -31,10 +31,10 @@ public class UDPClientAcceptor extends ClientAcceptor {
 	public synchronized void initConnector(IoHandler handler) {
 		if (connector == null) {
 			connector = new NioDatagramAcceptor();
-			connector.getSessionConfig().setMaxReadBufferSize(2048);
+			connector.getSessionConfig().setMaxReadBufferSize(ExpressConstant.MAX_PACKAGESIE);
 			// 添加过滤器
 			connector.getFilterChain().addLast("codec",
-					new ProtocolCodecFilter(new ExpressCodecFactory(Charset.forName("UTF-8"))));
+					new ProtocolCodecFilter(new ExpressCodecFactory(Charset.forName(ExpressConstant.DECODE_CHARSET))));
 			//设置日志过滤器
 			LoggingFilter loggingFilter = new LoggingFilter();
 			loggingFilter.setMessageReceivedLogLevel(LogLevel.DEBUG);
@@ -44,6 +44,7 @@ public class UDPClientAcceptor extends ClientAcceptor {
 			connector.getFilterChain().addLast("backFlowFilter", new BackFlowFilter());
 			// 添加业务逻辑处理器类
 			connector.setHandler(handler);
+			
 		}
 	}
 

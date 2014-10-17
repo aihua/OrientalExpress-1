@@ -32,7 +32,7 @@ public class TCPClient {
 		ExpressConnector connect = ExpressApi.createClientConnector(new ExpressHandler(), EpsConnMode.EPS_CONN_MODE_TCP);
 		try {
 			//开启连接
-			boolean connectSuc = ExpressApi.connectClientConnector(connect, "127.0.0.1", 8080);
+			boolean connectSuc = ExpressApi.connectClientConnector(connect, "198.2.221.1", 9625);
 			if (!connectSuc) {
 				System.out.println("无法连接到后台");
 				return;

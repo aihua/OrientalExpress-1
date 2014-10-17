@@ -60,6 +60,7 @@ public class UDPMulticastClient extends ClientConnector {
 			receiveMulticast = new MulticastSocket(port);
 			receiveMulticast.joinGroup(receiveAddress);
 			receiveMulticast.setSoTimeout(timeout * 1000);
+			receiveMulticast.setReceiveBufferSize(ExpressConstant.RECEIVE_BUFFERSIZE);
 			log.debug("超时时间：" + timeout + "秒");
 			runReceive();
 	}
@@ -84,10 +85,11 @@ public class UDPMulticastClient extends ClientConnector {
 		public void run() {
 			while (true) {
 				try {
-					DatagramPacket dp = new DatagramPacket(new byte[1024], 1024);
+					DatagramPacket dp = new DatagramPacket(new byte[ExpressConstant.MAX_PACKAGESIE],
+							ExpressConstant.MAX_PACKAGESIE);
 					receiveMulticast.receive(dp);//接收行情
 					byte[] inBytes = dp.getData();
-					FastMessageExpress messages = FastParser.parseHeader(inBytes);//解析字节流行情
+					FastMessageExpress messages = FastParser.parseMarketData(inBytes);//解析字节流行情
 					
 					//防回流
 					if (backFlowObj == null) {

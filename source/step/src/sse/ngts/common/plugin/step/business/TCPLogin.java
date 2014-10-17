@@ -1,6 +1,6 @@
 /*########################################################################
  *#                                                                      #
- *#                      Copyright (c) 2012 by                           #
+ *#                      Copyright (c) 2014 by                           #
  *#          Shanghai Stock Exchange (SSE), Shanghai, China              #
  *#                       All rights reserved.                           #
  *#                                                                      #
@@ -11,12 +11,17 @@ package sse.ngts.common.plugin.step.business;
 
 import sse.ngts.common.plugin.step.FieldNotFound;
 import sse.ngts.common.plugin.step.MessageEx;
+import sse.ngts.common.plugin.step.field.DefaultApplExtID;
+import sse.ngts.common.plugin.step.field.DefaultApplVerID;
+import sse.ngts.common.plugin.step.field.DefaultCstmApplVerID;
 import sse.ngts.common.plugin.step.field.EncryptMethod;
 import sse.ngts.common.plugin.step.field.HeartBtInt;
 import sse.ngts.common.plugin.step.field.MessageEncoding;
 import sse.ngts.common.plugin.step.field.MsgSeqNum;
 import sse.ngts.common.plugin.step.field.MsgType;
+import sse.ngts.common.plugin.step.field.NextExpectedMsgSeqNum;
 import sse.ngts.common.plugin.step.field.Password;
+import sse.ngts.common.plugin.step.field.ResetSeqNumFlag;
 import sse.ngts.common.plugin.step.field.SenderCompID;
 import sse.ngts.common.plugin.step.field.SendingTime;
 import sse.ngts.common.plugin.step.field.TargetCompID;
@@ -29,13 +34,13 @@ public class TCPLogin extends MessageEx {
 
 	public TCPLogin() {
 		super();
-		setMsgType(new MsgType(MSGTYPE));
+		setMsgType(new MsgType(MSGTYPE), 1);
 		getHeader().setField(new MsgType(MSGTYPE));
 	}
 
-	public TCPLogin(int[] fieldOrder) {
+	public TCPLogin(int[] fieldOrder, long sendMsgSeqNum) {
 		super(fieldOrder);
-		setMsgType(new MsgType(MSGTYPE));
+		setMsgType(new MsgType(MSGTYPE), sendMsgSeqNum);
 		getHeader().setField(new MsgType(MSGTYPE));
 	}
 
@@ -245,5 +250,119 @@ public class TCPLogin extends MessageEx {
 	public boolean isSetPassword() {
 		return isSetField(Password.FIELD);
 	}
-}
 
+	public void set(ResetSeqNumFlag value) {
+		setField(value);
+	}
+	
+	public ResetSeqNumFlag get(ResetSeqNumFlag value) throws FieldNotFound {
+		getField(value);
+		return value;
+	}
+	
+	public ResetSeqNumFlag getResetSeqNumFlag() throws FieldNotFound {
+		ResetSeqNumFlag value = new ResetSeqNumFlag();
+		getField(value);
+		return value;
+	}
+	
+	public boolean isSet(ResetSeqNumFlag field) {
+		return isSetField(field);
+	}
+	
+	public boolean isSetResetSeqNumFlag() {
+		return isSetField(ResetSeqNumFlag.FIELD);
+	}
+
+	public void set(NextExpectedMsgSeqNum value) {
+		setField(value);
+	}
+	
+	public NextExpectedMsgSeqNum get(NextExpectedMsgSeqNum value) throws FieldNotFound {
+		getField(value);
+		return value;
+	}
+	
+	public NextExpectedMsgSeqNum getNextExpectedMsgSeqNum() throws FieldNotFound {
+		NextExpectedMsgSeqNum value = new NextExpectedMsgSeqNum();
+		getField(value);
+		return value;
+	}
+	
+	public boolean isSet(NextExpectedMsgSeqNum field) {
+		return isSetField(field);
+	}
+	
+	public boolean isSetNextExpectedMsgSeqNum() {
+		return isSetField(NextExpectedMsgSeqNum.FIELD);
+	}
+
+	public void set(DefaultApplVerID value) {
+		setField(value);
+	}
+	
+	public DefaultApplVerID get(DefaultApplVerID value) throws FieldNotFound {
+		getField(value);
+		return value;
+	}
+	
+	public DefaultApplVerID getDefaultApplVerID() throws FieldNotFound {
+		DefaultApplVerID value = new DefaultApplVerID();
+		getField(value);
+		return value;
+	}
+	
+	public boolean isSet(DefaultApplVerID field) {
+		return isSetField(field);
+	}
+	
+	public boolean isSetDefaultApplVerID() {
+		return isSetField(DefaultApplVerID.FIELD);
+	}
+
+	public void set(DefaultApplExtID value) {
+		setField(value);
+	}
+	
+	public DefaultApplExtID get(DefaultApplExtID value) throws FieldNotFound {
+		getField(value);
+		return value;
+	}
+	
+	public DefaultApplExtID getDefaultApplExtID() throws FieldNotFound {
+		DefaultApplExtID value = new DefaultApplExtID();
+		getField(value);
+		return value;
+	}
+	
+	public boolean isSet(DefaultApplExtID field) {
+		return isSetField(field);
+	}
+	
+	public boolean isSetDefaultApplExtID() {
+		return isSetField(DefaultApplExtID.FIELD);
+	}
+
+	public void set(DefaultCstmApplVerID value) {
+		setField(value);
+	}
+	
+	public DefaultCstmApplVerID get(DefaultCstmApplVerID value) throws FieldNotFound {
+		getField(value);
+		return value;
+	}
+	
+	public DefaultCstmApplVerID getDefaultCstmApplVerID() throws FieldNotFound {
+		DefaultCstmApplVerID value = new DefaultCstmApplVerID();
+		getField(value);
+		return value;
+	}
+	
+	public boolean isSet(DefaultCstmApplVerID field) {
+		return isSetField(field);
+	}
+	
+	public boolean isSetDefaultCstmApplVerID() {
+		return isSetField(DefaultCstmApplVerID.FIELD);
+	}
+}

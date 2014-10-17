@@ -1,6 +1,6 @@
 /*########################################################################
  *#                                                                      #
- *#                      Copyright (c) 2012 by                           #
+ *#                      Copyright (c) 2014 by                           #
  *#          Shanghai Stock Exchange (SSE), Shanghai, China              #
  *#                       All rights reserved.                           #
  *#                                                                      #
@@ -17,6 +17,7 @@ import sse.ngts.common.plugin.step.field.MsgType;
 import sse.ngts.common.plugin.step.field.SenderCompID;
 import sse.ngts.common.plugin.step.field.SendingTime;
 import sse.ngts.common.plugin.step.field.TargetCompID;
+import sse.ngts.common.plugin.step.field.TestReqID;
 
 public class Heartbeat extends MessageEx {
 	private static final long serialVersionUID = 2446721918921254876L;
@@ -24,13 +25,13 @@ public class Heartbeat extends MessageEx {
 
 	public Heartbeat() {
 		super();
-		setMsgType(new MsgType(MSGTYPE));
+		setMsgType(new MsgType(MSGTYPE), 1);
 		getHeader().setField(new MsgType(MSGTYPE));
 	}
 
-	public Heartbeat(int[] fieldOrder) {
+	public Heartbeat(int[] fieldOrder, long sendMsgSeqNum) {
 		super(fieldOrder);
-		setMsgType(new MsgType(MSGTYPE));
+		setMsgType(new MsgType(MSGTYPE), sendMsgSeqNum);
 		getHeader().setField(new MsgType(MSGTYPE));
 	}
 
@@ -147,5 +148,28 @@ public class Heartbeat extends MessageEx {
 
 	public boolean isSetMessageEncoding() {
 		return isSetField(MessageEncoding.FIELD);
+	}
+	
+	public void set(TestReqID value) {
+		setField(value);
+	}
+	
+	public TestReqID get(TestReqID value) throws FieldNotFound {
+		getField(value);
+		return value;
+	}
+	
+	public TestReqID getTestReqID() throws FieldNotFound {
+		TestReqID value = new TestReqID();
+		getField(value);
+		return value;
+	}
+	
+	public boolean isSet(TestReqID field) {
+		return isSetField(field);
+	}
+	
+	public boolean isSetTestReqID() {
+		return isSetField(TestReqID.FIELD);
 	}
 }

@@ -6,6 +6,8 @@
 		<message name="MktDataFull" msgtype="W" msgcat="app">
 			<field name="SenderCompID" required="N" tag="49" />
 			<field name="TargetCompID" required="N" tag="56" />
+			<field name="PossDupFlag" required="N" tag="43" />
+			<field name="PossResend" required="N" tag="97" />
 			<field name="SendingTime" required="N" tag="52" />
 			<field name="MessageEncoding" required="N" tag="347" />
 			<field name="SecurityType" required="N" tag="167" />
@@ -38,6 +40,7 @@
 			<field name="TargetCompID" required="N" tag="56" />
 			<field name="SendingTime" required="N" tag="52" />
 			<field name="MessageEncoding" required="N" tag="347" />
+			<field name="TestReqID" required="N" tag="112" />
 		</message>
 
 		<message name="TCPLogin" msgtype="A" msgcat="app">
@@ -49,6 +52,11 @@
 			<field name="HeartBtInt" required="Y" tag="108" />
 			<field name="UserName" required="Y" tag="553" />
 			<field name="Password" required="N" tag="554" />
+			<field name="ResetSeqNumFlag" required="N" tag="141" />
+			<field name="NextExpectedMsgSeqNum" required="N" tag="789" />
+			<field name="DefaultApplVerID" required="Y" tag="1137" />
+			<field name="DefaultApplExtID" required="N" tag="1407" />
+			<field name="DefaultCstmApplVerID" required="N" tag="1408" />
 		</message>
 
 		<message name="TCPLogout" msgtype="5" msgcat="app">
@@ -57,6 +65,7 @@
 			<field name="SendingTime" required="N" tag="52" />
 			<field name="MessageEncoding" required="N" tag="347" />
 			<field name="Text" required="N" tag="58" />
+			<field name="SessionStatus" required="N" tag="1409" />
 		</message>
 
 		<message name="MarketDataRequest" msgtype="V" msgcat="app">
@@ -74,8 +83,10 @@
 			<field name="MessageEncoding" required="N" tag="347" />
 			<field name="SecurityType" required="Y" tag="167" />
 			<field name="TradSesMode" required="Y" tag="339" />
-			<field name="TradSesStatus" required="Y" tag="340" />
+			<field name="TradingSessionID" required="Y" tag="336" />
 			<field name="TotNoRelatedSym" required="Y" tag="393" />
+			<field name="PossDupFlag" required="N" tag="43" />
+			<field name="PossResend" required="N" tag="97" />
 		</message>
 	</messages>
 	<components>
@@ -90,6 +101,8 @@
 		<field number="49" name="SenderCompID" type="STRING" />
 		<field number="52" name="SendingTime" type="STRING" />
 		<field number="56" name="TargetCompID" type="STRING" />
+		<field number="43" name="PossDupFlag" type="STRING" />
+		<field number="97" name="PossResend" type="STRING" />
 		<field number="58" name="Text" type="STRING" />
 		<field number="75" name="TradeDate" type="STRING" />
 		<field number="95" name="RawDataLength" type="INT" />
@@ -109,7 +122,7 @@
 		<field number="274" name="MDEntryYield" type="FLOAT" />
 		<field number="290" name="MDEntryPositionNo" type="INT" />
 		<field number="339" name="TradSesMode" type="INT" />
-		<field number="340" name="TradSesStatus" type="INT" />
+		<field number="336" name="TradingSessionID" type="STRING" />
 		<field number="347" name="MessageEncoding" type="STRING" />
 		<field number="387" name="TotalVolumeTraded" type="QTY" />
 		<field number="393" name="TotNoRelatedSym" type="INT" />
@@ -124,5 +137,14 @@
 		<field number="8538" name="TradingPhaseCode" type="STRING" />
 		<field number="265" name="MDUpdateType" type="STRING" />
 		<field number="5468" name="NoSecurities" type="INT" />
+		
+		<field number="112" name="TestReqID" type="STRING" />
+		<field number="1409" name="SessionStatus" type="INT" />
+		<field number="141" name="ResetSeqNumFlag" type="STRING" />
+		<field number="789" name="NextExpectedMsgSeqNum" type="LONG" />
+		<field number="1137" name="DefaultApplVerID" type="STRING" />
+		<field number="1407" name="DefaultApplExtID" type="INT" />
+		<field number="1408" name="DefaultCstmApplVerID" type="STRING" />
+		
 	</fields>
 </STEP>

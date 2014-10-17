@@ -8,13 +8,46 @@
  */
 package sse.ngts.common.plugin.step.business;
 
-import sse.ngts.common.plugin.step.*;
-import sse.ngts.common.plugin.step.field.*;
+import sse.ngts.common.plugin.step.FieldNotFound;
+import sse.ngts.common.plugin.step.field.AccruedInterestAmt;
+import sse.ngts.common.plugin.step.field.ApplID;
+import sse.ngts.common.plugin.step.field.ApplSeqNum;
+import sse.ngts.common.plugin.step.field.CheckSum;
+import sse.ngts.common.plugin.step.field.LastUpdateTime;
+import sse.ngts.common.plugin.step.field.MDCount;
+import sse.ngts.common.plugin.step.field.MDEntryPositionNo;
+import sse.ngts.common.plugin.step.field.MDEntryPx;
+import sse.ngts.common.plugin.step.field.MDEntryRefID;
+import sse.ngts.common.plugin.step.field.MDEntrySize;
+import sse.ngts.common.plugin.step.field.MDEntryType;
+import sse.ngts.common.plugin.step.field.MDReportID;
+import sse.ngts.common.plugin.step.field.MDUpdateAction;
+import sse.ngts.common.plugin.step.field.MDUpdateType;
+import sse.ngts.common.plugin.step.field.MessageEncoding;
+import sse.ngts.common.plugin.step.field.MsgSeqNum;
+import sse.ngts.common.plugin.step.field.MsgType;
+import sse.ngts.common.plugin.step.field.NoMDEntries;
+import sse.ngts.common.plugin.step.field.NoPartyIDs;
+import sse.ngts.common.plugin.step.field.RawData;
+import sse.ngts.common.plugin.step.field.RawDataLength;
+import sse.ngts.common.plugin.step.field.RefreshIndicator;
+import sse.ngts.common.plugin.step.field.SecurityID;
+import sse.ngts.common.plugin.step.field.SecurityType;
+import sse.ngts.common.plugin.step.field.SenderCompID;
+import sse.ngts.common.plugin.step.field.SendingTime;
+import sse.ngts.common.plugin.step.field.Symbol;
+import sse.ngts.common.plugin.step.field.TargetCompID;
+import sse.ngts.common.plugin.step.field.Text;
+import sse.ngts.common.plugin.step.field.TotalLongPosition;
+import sse.ngts.common.plugin.step.field.TotalValueTraded;
+import sse.ngts.common.plugin.step.field.TotalVolumeTraded;
+import sse.ngts.common.plugin.step.field.TradSesMode;
+import sse.ngts.common.plugin.step.field.TradeDate;
+import sse.ngts.common.plugin.step.field.TradingPhaseCode;
+import sse.ngts.common.plugin.step.field.TransactTime;
+import sse.ngts.common.plugin.step.field.UnderlyingDirtyPrice;
+import sse.ngts.common.plugin.step.field.Yield;
 
-/**
- * 收到消息后解析成的step头信息的封装
- * @author kzhao
- */
 public class MktDataFull extends Message {
 	private static final long serialVersionUID = 20130819;
 	public static final String MSGTYPE = "W";
@@ -879,4 +912,50 @@ public class MktDataFull extends Message {
 	public boolean isSetTotalLongPosition() {
 		return isSetField(TotalLongPosition.FIELD);
 	}
+	
+/*	public void set(PossDupFlag value) {
+		setField(value);
+	}
+	
+	public PossDupFlag get(PossDupFlag value) throws FieldNotFound {
+		getField(value);
+		return value;
+	}
+	
+	public PossDupFlag getPossDupFlag() throws FieldNotFound {
+		PossDupFlag value = new PossDupFlag();
+		getField(value);
+		return value;
+	}
+	
+	public boolean isSet(PossDupFlag field) {
+		return isSetField(field);
+	}
+	
+	public boolean isSetPossDupFlag() {
+		return isSetField(PossDupFlag.FIELD);
+	}
+	
+	public void set(PossResend value) {
+		setField(value);
+	}
+	
+	public PossResend get(PossResend value) throws FieldNotFound {
+		getField(value);
+		return value;
+	}
+	
+	public PossResend getPossResend() throws FieldNotFound {
+		PossResend value = new PossResend();
+		getField(value);
+		return value;
+	}
+	
+	public boolean isSet(PossResend field) {
+		return isSetField(field);
+	}
+	
+	public boolean isSetPossResend() {
+		return isSetField(PossResend.FIELD);
+	}*/
 }

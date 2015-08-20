@@ -28,7 +28,7 @@ import sse.ngts.ezexpress.timer.HealthDaemon;
 import sse.ngts.ezexpress.util.StepMessage;
 
 /**
- * TCP¿Í»§¶ËÁ¬½ÓÀà
+ * TCPå®¢æˆ·ç«¯è¿æ¥ç±»
  */
 public class TCPClientConnector extends ClientConnector {
 	private static Logger log = Logger.getLogger(TCPClientConnector.class);
@@ -42,72 +42,70 @@ public class TCPClientConnector extends ClientConnector {
 	}
 
 	/**
-	 *  ³õÊ¼»¯Á¬½ÓÀà
+	 *  åˆå§‹åŒ–è¿æ¥ç±»
 	 */
 	public synchronized void initConnector(IoHandler handler) {
 		if (connector == null) {
 			connector = new NioSocketConnector();
-			//ÉèÖÃ»º´æ´óĞ¡
-			connector.getSessionConfig().setMaxReadBufferSize(ExpressConstant.MAX_PACKAGESIE);
 			connector.getSessionConfig().setTcpNoDelay(true);
-			// Ìí¼Ó¹ıÂËÆ÷
+			// æ·»åŠ è¿‡æ»¤å™¨
 			connector.getFilterChain().addLast("codec",
 					new ProtocolCodecFilter(new ExpressCodecFactory(Charset.forName(ExpressConstant.DECODE_CHARSET))));
 			
-			//ÉèÖÃÈÕÖ¾¹ıÂËÆ÷
+			//è®¾ç½®æ—¥å¿—è¿‡æ»¤å™¨
 			LoggingFilter loggingFilter = new LoggingFilter();
 			loggingFilter.setMessageReceivedLogLevel(LogLevel.DEBUG);
 			loggingFilter.setMessageSentLogLevel(LogLevel.DEBUG);
 			connector.getFilterChain().addLast("logger", loggingFilter);
-			//Ìí¼ÓµÇÂ¼¹ıÂËÆ÷
+			//æ·»åŠ ç™»å½•è¿‡æ»¤å™¨
 			connector.getFilterChain().addLast("loginFilter", new TCPLoginFilter());
-			//Ìí¼ÓµÇ³ö¹ıÂËÆ÷
+			//æ·»åŠ ç™»å‡ºè¿‡æ»¤å™¨
 			connector.getFilterChain().addLast("logoutFilter", new TCPLogoutFilter());
-			//·À»ØÁ÷¹ıÂËÆ÷
+			//é˜²å›æµè¿‡æ»¤å™¨
 			connector.getFilterChain().addLast("backFlowFilter", new BackFlowFilter());
 
-			// Ìí¼ÓÒµÎñÂß¼­´¦ÀíÆ÷Àà
+			// æ·»åŠ ä¸šåŠ¡é€»è¾‘å¤„ç†å™¨ç±»
 			connector.setHandler(handler);
 		}
 	}
 
 	/**
-	 * ¸ù¾İhostºÍportĞÂ½¨Ò»¸öIoSessionÁ¬½Ó
-	 * @param host Á¬½ÓÖ÷»úIP
-	 * @param port Á¬½Ó¶Ë¿Ú
+	 * æ ¹æ®hostå’Œportæ–°å»ºä¸€ä¸ªIoSessionè¿æ¥
+	 * @param host è¿æ¥ä¸»æœºIP
+	 * @param port è¿æ¥ç«¯å£
 	 */
 	public void connect(String host, int port) throws Exception {
 		connect(host, port, ExpressConstant.RECEIVE_TIMEOUT);
 	}
 
 	/**
-	 * ¸ù¾İhostºÍportĞÂ½¨Ò»¸öIoSessionÁ¬½Ó
-	 * @param host Á¬½ÓÖ÷»úIP
-	 * @param port Á¬½Ó¶Ë¿Ú
-	 * @param timeout Î´ÊÕµ½Êı¾İ³¬Ê±Ê±¼ä/Ãë
+	 * æ ¹æ®hostå’Œportæ–°å»ºä¸€ä¸ªIoSessionè¿æ¥
+	 * @param host è¿æ¥ä¸»æœºIP
+	 * @param port è¿æ¥ç«¯å£
+	 * @param timeout æœªæ”¶åˆ°æ•°æ®è¶…æ—¶æ—¶é—´/ç§’
 	 */
 	@Override
 	public void connect(String host, int port, int timeout) throws Exception {
 		connector.getSessionConfig().setIdleTime(IdleStatus.READER_IDLE, timeout);
-		log.debug("³¬Ê±Ê±¼ä£º" + timeout + "Ãë");
-		// ÉèÖÃÁ¬½Ó³¬Ê±Ê±¼ä
+		log.debug("è¶…æ—¶æ—¶é—´ï¼š" + timeout + "ç§’");
+		// è®¾ç½®è¿æ¥è¶…æ—¶æ—¶é—´
 		connector.setConnectTimeoutMillis(ExpressConstant.CONNECT_TIMEOUT);  
 
-		// ´´½¨Á¬½Ó
+		// åˆ›å»ºè¿æ¥
 		ConnectFuture future = connector.connect(new InetSocketAddress(host, port));
 
-		// µÈ´ıÁ¬½Ó´´½¨Íê³É
+		// ç­‰å¾…è¿æ¥åˆ›å»ºå®Œæˆ
 		future.awaitUninterruptibly();
 
-		//µÃµ½Á¬½ÓSession
+		//å¾—åˆ°è¿æ¥Session
 		session = future.getSession();
-		//ÉèÖÃSessionÍ¬²½Ëø¶ÔÏó
+		//è®¾ç½®SessionåŒæ­¥é”å¯¹è±¡
 		session.setAttribute(ExpressConstant.SESSION_LOCK, new LockExpress());
 		
 	}
 
 	/**
-	 * µÇÂ¼/µÇ³öÊÇ·ñ³É¹¦
+	 * ç™»å½•/ç™»å‡ºæ˜¯å¦æˆåŠŸ
 	 * @return boolean
 	 */
 	public boolean isLockOk() {
@@ -119,7 +117,7 @@ public class TCPClientConnector extends ClientConnector {
 	}
 
 	/**
-	 * Ëø¶¨µÇÂ¼/µÇ³öµ±Ç°Ïß³Ì
+	 * é”å®šç™»å½•/ç™»å‡ºå½“å‰çº¿ç¨‹
 	 * @throws InterruptedException
 	 */
 	public void doLock() throws InterruptedException {
@@ -133,9 +131,9 @@ public class TCPClientConnector extends ClientConnector {
 	}
 
 	/**
-	 * ·¢ËÍµÇÂ¼ÏûÏ¢
-	 * @param userName ÓÃ»§Ãû
-	 * @param password ÃÜÂë
+	 * å‘é€ç™»å½•æ¶ˆæ¯
+	 * @param userName ç”¨æˆ·å
+	 * @param password å¯†ç 
 	 */
 	public boolean sendLoginMessage(String userName, String password) {
 		STEPParser app = ParserConfig.getInstance().getStep();
@@ -146,14 +144,14 @@ public class TCPClientConnector extends ClientConnector {
 		} catch (InterruptedException e) {
 			log.error("Send Login Message InterruptedException: ", e);
 		}
-		if(isLockOk()) {//µÇÂ¼³É¹¦¿ªÆô¶¨Ê±ĞÄÌø·¢ËÍ
+		if(isLockOk()) {//ç™»å½•æˆåŠŸå¼€å¯å®šæ—¶å¿ƒè·³å‘é€
 			healthDaemon = new HealthDaemon(session);
 		}
 		return isLockOk();
 	}
 
 	/**
-	 *  ·¢ËÍ×¢ÏúÏûÏ¢
+	 *  å‘é€æ³¨é”€æ¶ˆæ¯
 	 */
 	public boolean sendLogoutMessage() {
 		STEPParser app = ParserConfig.getInstance().getStep();
@@ -168,17 +166,17 @@ public class TCPClientConnector extends ClientConnector {
 	}
 
 	/**
-	 * send·¢ËÍ¶©ÔÄÏûÏ¢
+	 * sendå‘é€è®¢é˜…æ¶ˆæ¯
 	 */
 	public void sendMarketMessage(MarketType mrkType) {
-		//·¢ËÍ¶©ÔÄÏûÏ¢
+		//å‘é€è®¢é˜…æ¶ˆæ¯
 		STEPParser app = ParserConfig.getInstance().getStep();
 		Message marketMessage = StepMessage.getMarketSubscribeMessage(app, mrkType.getMkdRequest());
 		session.write(marketMessage);
 	}
 
 	/**
-	 * ×¢Ïúµ±Ç°Á¬½Ó
+	 * æ³¨é”€å½“å‰è¿æ¥
 	 */
 	public void dispose() {
 		if (connector != null) {

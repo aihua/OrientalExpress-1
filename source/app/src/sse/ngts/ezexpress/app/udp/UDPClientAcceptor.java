@@ -26,31 +26,30 @@ public class UDPClientAcceptor extends ClientAcceptor {
 	}
 
 	/**
-	 *  ³õÊ¼»¯Á¬½ÓÀà
+	 *  åˆå§‹åŒ–è¿æ¥ç±»
 	 */
 	public synchronized void initConnector(IoHandler handler) {
 		if (connector == null) {
 			connector = new NioDatagramAcceptor();
-			connector.getSessionConfig().setMaxReadBufferSize(ExpressConstant.MAX_PACKAGESIE);
-			// Ìí¼Ó¹ıÂËÆ÷
+			// æ·»åŠ è¿‡æ»¤å™¨
 			connector.getFilterChain().addLast("codec",
 					new ProtocolCodecFilter(new ExpressCodecFactory(Charset.forName(ExpressConstant.DECODE_CHARSET))));
-			//ÉèÖÃÈÕÖ¾¹ıÂËÆ÷
+			//è®¾ç½®æ—¥å¿—è¿‡æ»¤å™¨
 			LoggingFilter loggingFilter = new LoggingFilter();
 			loggingFilter.setMessageReceivedLogLevel(LogLevel.DEBUG);
 			loggingFilter.setMessageSentLogLevel(LogLevel.DEBUG);
 			connector.getFilterChain().addLast("logger", loggingFilter);
-			//·À»ØÁ÷¹ıÂËÆ÷
+			//é˜²å›æµè¿‡æ»¤å™¨
 			connector.getFilterChain().addLast("backFlowFilter", new BackFlowFilter());
-			// Ìí¼ÓÒµÎñÂß¼­´¦ÀíÆ÷Àà
+			// æ·»åŠ ä¸šåŠ¡é€»è¾‘å¤„ç†å™¨ç±»
 			connector.setHandler(handler);
 			
 		}
 	}
 
 	/**
-	 * ¸ù¾İportĞÂ½¨Ò»¸öUDPµ¥²¥Á¬½Ó½ÓÊÕÊı¾İ
-	 * @param port ¶Ë¿Ú
+	 * æ ¹æ®portæ–°å»ºä¸€ä¸ªUDPå•æ’­è¿æ¥æ¥æ”¶æ•°æ®
+	 * @param port ç«¯å£
 	 */
 	@Override
 	public void connect(int port) throws Exception {
@@ -58,21 +57,21 @@ public class UDPClientAcceptor extends ClientAcceptor {
 	}
 
 	/**
-	 * session°ó¶¨port
-	 * @param port °ó¶¨¶Ë¿Ú
-	 * @param timeout ½ÓÊÕĞĞÇéÊı¾İ³¬Ê±Ê±¼ä/Ãë
+	 * sessionç»‘å®šport
+	 * @param port ç»‘å®šç«¯å£
+	 * @param timeout æ¥æ”¶è¡Œæƒ…æ•°æ®è¶…æ—¶æ—¶é—´/ç§’
 	 */
 	@Override
 	public void connect(int port, int timeout) throws Exception {
-		// ´´½¨Á¬½Ó
+		// åˆ›å»ºè¿æ¥
 		connector.bind(new InetSocketAddress(port));
-		// ÉèÖÃ»á»°³¬Ê±Ê±¼ä
+		// è®¾ç½®ä¼šè¯è¶…æ—¶æ—¶é—´
 		connector.getSessionConfig().setIdleTime(IdleStatus.READER_IDLE, timeout);
-		log.debug("³¬Ê±Ê±¼ä£º" + timeout + "Ãë");
+		log.debug("è¶…æ—¶æ—¶é—´ï¼š" + timeout + "ç§’");
 	}
 
 	/**
-	 * ×¢Ïúµ±Ç°Á¬½Ó
+	 * æ³¨é”€å½“å‰è¿æ¥
 	 */
 	public void dispose() {
 		if (connector != null) {

@@ -20,7 +20,7 @@ import sse.ngts.ezexpress.app.ExpressEnum.MarketType;
 import sse.ngts.ezexpress.demo.handle.ExpressHandler;
 
 /**
- * TCPÁ¬½Ó¼òµ¥Demo
+ * TCPè¿æ¥ç®€å•Demo
  * @since 2014-06
  * @author kzhao
  */
@@ -28,25 +28,25 @@ public class TCPClient {
 	
 	public static void main(String[] args) {
 		PropertyConfigurator.configure("cfg/log4j.properties");
-		//½¨Á¢Á¬½Ó
+		//å»ºç«‹è¿æ¥
 		ExpressConnector connect = ExpressApi.createClientConnector(new ExpressHandler(), EpsConnMode.EPS_CONN_MODE_TCP);
 		try {
-			//¿ªÆôÁ¬½Ó
-			boolean connectSuc = ExpressApi.connectClientConnector(connect, "198.2.221.1", 9625);
+			//å¼€å¯è¿æ¥
+			boolean connectSuc = ExpressApi.connectClientConnector(connect, "xxxx.xxxx.xxxx.xxxx", xxxx);
 			if (!connectSuc) {
-				System.out.println("ÎŞ·¨Á¬½Óµ½ºóÌ¨");
+				System.out.println("æ— æ³•è¿æ¥åˆ°åå°");
 				return;
 			}
 		} catch (Exception e) {
-			System.out.println("ÎŞ·¨Á¬½Óµ½ºóÌ¨");
+			System.out.println("æ— æ³•è¿æ¥åˆ°åå°");
 			return;
 		}
 
-		if (ExpressApi.connectorLogin(connect, "111111", "111111")) {//µÇÂ¼
-			System.out.println("·¢ËÍ¶©ÔÄÏûÏ¢");
-			ExpressApi.subscribeMarketData(connect, MarketType.EPS_MKTTYPE_ALL);//·¢ËÍ¶©ÔÄÏûÏ¢
+		if (ExpressApi.connectorLogin(connect, "xxxxxx", "xxxxxx")) {//ç™»å½•
+			System.out.println("å‘é€è®¢é˜…æ¶ˆæ¯");
+			ExpressApi.subscribeMarketData(connect, MarketType.EPS_MKTTYPE_ALL);//å‘é€è®¢é˜…æ¶ˆæ¯
 		} else {
-			System.out.println("µÇÂ¼³¬Ê±!!");
+			System.out.println("ç™»å½•è¶…æ—¶!!");
 			return;
 		}
 
@@ -54,9 +54,9 @@ public class TCPClient {
 			try {
 				String input = new BufferedReader(new InputStreamReader(System.in)).readLine();
 				if ("Logout".equalsIgnoreCase(input.trim())) {
-					//µÇ³ö
+					//ç™»å‡º
 					ExpressApi.connectorLogout(connect);
-					//Ïú»Ù½Ó¿Ú
+					//é”€æ¯æ¥å£
 					ExpressApi.destroyClientConnector(connect);
 					break;
 				}

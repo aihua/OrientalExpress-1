@@ -18,10 +18,10 @@ OrientalExpress项目是由上海证券交易所技术人员主导的一个开�
 ================
 
 客户端演示用例中有一个UDP单点接收行情的demo：source/demo/src/sse/ngts/ezexpress/demo/udp/UDPUnicastClient.java<br>
-FAST行情不会通过UDP单点模式发送，新增此接口是为了利于将来扩展业务，例如:通过SR协议接收show2003文件。
+FAST行情不会通过UDP单点模式发送，新增此接口是为了利于将来扩展业务，例如:通过SR协议接收私有文件。
 
 
 【联系方式】
 ================
 
-上海证券交易所  章奕：yzhang@sse.com.cn;  赵凯： kzhao@sse.com.cn
+上海证券交易所  赵凯： kzhao@sse.com.cn

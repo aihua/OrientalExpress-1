@@ -11,6 +11,7 @@ package sse.ngts.ezexpress.demo.udp;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import sse.ngts.ezexpress.app.ExpressApi;
@@ -24,6 +25,8 @@ import sse.ngts.ezexpress.demo.handle.ExpressHandler;
  */
 public class UDPUnicastClient {
 
+	private static Logger log = Logger.getLogger(UDPUnicastClient.class);
+	
 	public static void main(String[] args) {
 		PropertyConfigurator.configure("cfg/log4j.properties");
 		//建立连接
@@ -31,7 +34,7 @@ public class UDPUnicastClient {
 		try {
 			ExpressApi.connectClientConnector(connect, "127.0.0.1", 6661);//开启连接
 		} catch (Exception e) {
-			System.out.println("无法连接到后台...");
+			log.info("无法连接到后台...", e);
 			return;
 		}
 
@@ -45,10 +48,9 @@ public class UDPUnicastClient {
 					isWhile = false;
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.error("Logout exception", e);
 			}
 		}
-		connect.dispose();
 	}
 
 }

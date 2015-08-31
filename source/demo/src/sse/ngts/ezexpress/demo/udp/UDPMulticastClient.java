@@ -11,6 +11,7 @@ package sse.ngts.ezexpress.demo.udp;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import sse.ngts.ezexpress.app.ExpressApi;
@@ -23,7 +24,9 @@ import sse.ngts.ezexpress.demo.handle.ExpressHandler;
  * @author kzhao
  */
 public class UDPMulticastClient {
-
+	
+	private static Logger log = Logger.getLogger(UDPMulticastClient.class);
+	
 	public static void main(String[] args) {
 		PropertyConfigurator.configure("cfg/log4j.properties");
 		try {
@@ -32,15 +35,15 @@ public class UDPMulticastClient {
 			connect.connect("225.225.225.0", 6661);//开启连接
 			
 			while (true) {
-				System.out.println("是否终止连接(true)：");
+				log.info("是否终止连接(true)：");
 				String input = new BufferedReader(new InputStreamReader(System.in)).readLine();
 				if ("true".equals(input.trim())) {
-					connect.dispose();
+					ExpressApi.destroyClientConnector(connect);
 					break;
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Logout exception", e);
 		}
 		
 	}

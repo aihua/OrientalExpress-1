@@ -2,6 +2,7 @@ package sse.ngts.ezexpress.app.codec;
 
 import java.nio.charset.Charset;
 
+import org.apache.log4j.Logger;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.CumulativeProtocolDecoder;
@@ -20,15 +21,13 @@ import sse.ngts.ezexpress.util.ExpressUtil;
  */
 public class StepProtocalDecoder extends CumulativeProtocolDecoder {
 
+	private static Logger log = Logger.getLogger(StepProtocalDecoder.class);
 	private Charset charset;
 	private int totalLengthWithoutBody;//没有body的总长度
-	private int afterBeginStrMinLength;//在"8=FIXT.1.1"之后需要的最小长度：不包括body
 	
 	public StepProtocalDecoder(Charset charset) {
 		this.charset = charset;
 		totalLengthWithoutBody = ExpressConstant.BEGINSTRING_LENGTH_WITH_SPLIT + ExpressConstant.SPLIT_BYTE_LENGTH 
-				+ ExpressConstant.CHECKSUM_LENGTH + ExpressConstant.SPLIT_BYTE_LENGTH;
-		afterBeginStrMinLength = ExpressConstant.BODYLENGTH_REGION_STRING + ExpressConstant.REGION_VALU_SPLIT_STRING.length() 
 				+ ExpressConstant.CHECKSUM_LENGTH + ExpressConstant.SPLIT_BYTE_LENGTH;
 	}
 
@@ -48,19 +47,16 @@ public class StepProtocalDecoder extends CumulativeProtocolDecoder {
 			byte[] beginLengthByte = new byte[ExpressConstant.BEGINSTRING_LENGTH_NOT_SPLIT];
 			try {
 				in.get(beginLengthByte);
-				while (!(new String(beginLengthByte).equals(ExpressConstant.BEGINSTRING))) {
+				while (!(ExpressConstant.BEGINSTRING.equals(new String(beginLengthByte)))) {
 					position = position + 1;
 					in.position(position);
 					in.get(beginLengthByte);
 				}
 			} catch (Exception e) {
-				break;
+				log.error("get beginLengthByte exception:", e);
 			}			
 			
 			in.position(position);//移动position到"8=FIXT.1.1"之后
-			if (in.remaining() < afterBeginStrMinLength) {
-				break;
-			}
 			
 			int bodyLengthByteLen = 0;	//表示"消息体长度"这个字段所占的长度
 			while (in.get() != 1 && bodyLengthByteLen <= ExpressConstant.MAX_BODYLENGTH) {//计算bodyLength占用的字节长度
@@ -83,6 +79,7 @@ public class StepProtocalDecoder extends CumulativeProtocolDecoder {
 				}
 			} catch (Exception e) {
 				in.position(position);
+				log.error("get bodyLength exception:", e);
 				break;
 			}			
 			

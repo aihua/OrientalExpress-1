@@ -9,7 +9,6 @@ import org.apache.mina.core.session.IoSession;
 
 import sse.ngts.common.plugin.step.business.MarketStatus;
 import sse.ngts.common.plugin.step.business.MktDataBody;
-import sse.ngts.common.plugin.step.field.MsgSeqNum;
 import sse.ngts.ezexpress.app.codec.FastMessageExpress;
 
 /**

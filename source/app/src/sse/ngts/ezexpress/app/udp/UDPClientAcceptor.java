@@ -31,7 +31,6 @@ public class UDPClientAcceptor extends ClientAcceptor {
 	public synchronized void initConnector(IoHandler handler) {
 		if (connector == null) {
 			connector = new NioDatagramAcceptor();
-			connector.getSessionConfig().setMaxReadBufferSize(ExpressConstant.MAX_PACKAGESIE);
 			// Ìí¼Ó¹ýÂËÆ÷
 			connector.getFilterChain().addLast("codec",
 					new ProtocolCodecFilter(new ExpressCodecFactory(Charset.forName(ExpressConstant.DECODE_CHARSET))));

@@ -28,7 +28,7 @@ import sse.ngts.ezexpress.timer.HealthDaemon;
 import sse.ngts.ezexpress.util.StepMessage;
 
 /**
- * TCP瀹㈡埛绔繛鎺ョ被
+ * TCP客户端连接类
  */
 public class TCPClientConnector extends ClientConnector {
 	private static Logger log = Logger.getLogger(TCPClientConnector.class);
@@ -42,70 +42,70 @@ public class TCPClientConnector extends ClientConnector {
 	}
 
 	/**
-	 *  鍒濆鍖栬繛鎺ョ被
+	 *  初始化连接类
 	 */
 	public synchronized void initConnector(IoHandler handler) {
 		if (connector == null) {
 			connector = new NioSocketConnector();
 			connector.getSessionConfig().setTcpNoDelay(true);
-			// 娣诲姞杩囨护鍣?
+			// 添加过滤器
 			connector.getFilterChain().addLast("codec",
 					new ProtocolCodecFilter(new ExpressCodecFactory(Charset.forName(ExpressConstant.DECODE_CHARSET))));
 			
-			//璁剧疆鏃ュ織杩囨护鍣?
+			//设置日志过滤器
 			LoggingFilter loggingFilter = new LoggingFilter();
 			loggingFilter.setMessageReceivedLogLevel(LogLevel.DEBUG);
 			loggingFilter.setMessageSentLogLevel(LogLevel.DEBUG);
 			connector.getFilterChain().addLast("logger", loggingFilter);
-			//娣诲姞鐧诲綍杩囨护鍣?
+			//添加登录过滤器
 			connector.getFilterChain().addLast("loginFilter", new TCPLoginFilter());
-			//娣诲姞鐧诲嚭杩囨护鍣?
+			//添加登出过滤器
 			connector.getFilterChain().addLast("logoutFilter", new TCPLogoutFilter());
-			//闃插洖娴佽繃婊ゅ櫒
+			//防回流过滤器
 			connector.getFilterChain().addLast("backFlowFilter", new BackFlowFilter());
 
-			// 娣诲姞涓氬姟閫昏緫澶勭悊鍣ㄧ被
+			// 添加业务逻辑处理器类
 			connector.setHandler(handler);
 		}
 	}
 
 	/**
-	 * 鏍规嵁host鍜宲ort鏂板缓涓?涓狪oSession杩炴帴
-	 * @param host 杩炴帴涓绘満IP
-	 * @param port 杩炴帴绔彛
+	 * 根据host和port新建一个IoSession连接
+	 * @param host 连接主机IP
+	 * @param port 连接端口
 	 */
 	public void connect(String host, int port) throws Exception {
 		connect(host, port, ExpressConstant.RECEIVE_TIMEOUT);
 	}
 
 	/**
-	 * 鏍规嵁host鍜宲ort鏂板缓涓?涓狪oSession杩炴帴
-	 * @param host 杩炴帴涓绘満IP
-	 * @param port 杩炴帴绔彛
-	 * @param timeout 鏈敹鍒版暟鎹秴鏃舵椂闂?/绉?
+	 * 根据host和port新建一个IoSession连接
+	 * @param host 连接主机IP
+	 * @param port 连接端口
+	 * @param timeout 未收到数据超时时间/秒
 	 */
 	@Override
 	public void connect(String host, int port, int timeout) throws Exception {
 		connector.getSessionConfig().setIdleTime(IdleStatus.READER_IDLE, timeout);
-		log.debug("瓒呮椂鏃堕棿锛?" + timeout + "绉?");
-		// 璁剧疆杩炴帴瓒呮椂鏃堕棿
+		log.debug("超时时间：" + timeout + "秒");
+		// 设置连接超时时间
 		connector.setConnectTimeoutMillis(ExpressConstant.CONNECT_TIMEOUT);  
 
-		// 鍒涘缓杩炴帴
+		// 创建连接
 		ConnectFuture future = connector.connect(new InetSocketAddress(host, port));
 
-		// 绛夊緟杩炴帴鍒涘缓瀹屾垚
+		// 等待连接创建完成
 		future.awaitUninterruptibly();
 
-		//寰楀埌杩炴帴Session
+		//得到连接Session
 		session = future.getSession();
-		//璁剧疆Session鍚屾閿佸璞?
+		//设置Session同步锁对象
 		session.setAttribute(ExpressConstant.SESSION_LOCK, new LockExpress());
 		
 	}
 
 	/**
-	 * 鐧诲綍/鐧诲嚭鏄惁鎴愬姛
+	 * 登录/登出是否成功
 	 * @return boolean
 	 */
 	public boolean isLockOk() {
@@ -117,7 +117,7 @@ public class TCPClientConnector extends ClientConnector {
 	}
 
 	/**
-	 * 閿佸畾鐧诲綍/鐧诲嚭褰撳墠绾跨▼
+	 * 锁定登录/登出当前线程
 	 * @throws InterruptedException
 	 */
 	public void doLock() throws InterruptedException {
@@ -131,9 +131,9 @@ public class TCPClientConnector extends ClientConnector {
 	}
 
 	/**
-	 * 鍙戦?佺櫥褰曟秷鎭?
-	 * @param userName 鐢ㄦ埛鍚?
-	 * @param password 瀵嗙爜
+	 * 发送登录消息
+	 * @param userName 用户名
+	 * @param password 密码
 	 */
 	public boolean sendLoginMessage(String userName, String password) {
 		STEPParser app = ParserConfig.getInstance().getStep();
@@ -144,14 +144,14 @@ public class TCPClientConnector extends ClientConnector {
 		} catch (InterruptedException e) {
 			log.error("Send Login Message InterruptedException: ", e);
 		}
-		if(isLockOk()) {//鐧诲綍鎴愬姛寮?鍚畾鏃跺績璺冲彂閫?
+		if(isLockOk()) {//登录成功开启定时心跳发送
 			healthDaemon = new HealthDaemon(session);
 		}
 		return isLockOk();
 	}
 
 	/**
-	 *  鍙戦?佹敞閿?娑堟伅
+	 *  发送注销消息
 	 */
 	public boolean sendLogoutMessage() {
 		STEPParser app = ParserConfig.getInstance().getStep();
@@ -166,17 +166,17 @@ public class TCPClientConnector extends ClientConnector {
 	}
 
 	/**
-	 * send鍙戦?佽闃呮秷鎭?
+	 * send发送订阅消息
 	 */
 	public void sendMarketMessage(MarketType mrkType) {
-		//鍙戦?佽闃呮秷鎭?
+		//发送订阅消息
 		STEPParser app = ParserConfig.getInstance().getStep();
 		Message marketMessage = StepMessage.getMarketSubscribeMessage(app, mrkType.getMkdRequest());
 		session.write(marketMessage);
 	}
 
 	/**
-	 * 娉ㄩ攢褰撳墠杩炴帴
+	 * 注销当前连接
 	 */
 	public void dispose() {
 		if (connector != null) {

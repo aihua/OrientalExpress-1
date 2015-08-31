@@ -18,22 +18,26 @@ import sse.ngts.ezexpress.util.ExpressUtil;
 
 /**
  * API定义数据解码器
+ * @author kzhao
  */
 public class StepProtocalDecoder extends CumulativeProtocolDecoder {
 
 	private static Logger log = Logger.getLogger(StepProtocalDecoder.class);
 	private Charset charset;
 	private int totalLengthWithoutBody;//没有body的总长度
+	private int afterBeginStrMinLength;//在"8=FIXT.1.1"之后需要的最小长度：不包括body
 	
 	public StepProtocalDecoder(Charset charset) {
 		this.charset = charset;
 		totalLengthWithoutBody = ExpressConstant.BEGINSTRING_LENGTH_WITH_SPLIT + ExpressConstant.SPLIT_BYTE_LENGTH 
 				+ ExpressConstant.CHECKSUM_LENGTH + ExpressConstant.SPLIT_BYTE_LENGTH;
+		afterBeginStrMinLength = ExpressConstant.BODYLENGTH_REGION_STRING + ExpressConstant.REGION_VALU_SPLIT_STRING.length() 
+				+ ExpressConstant.CHECKSUM_LENGTH + ExpressConstant.SPLIT_BYTE_LENGTH * 2;
 	}
 
 	@Override
 	protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
-		int position = ExpressConstant.BEGINSTRING_LENGTH_WITH_SPLIT;
+		int position = 0;
 		while (true) {//解析中缓存中所有的完整step消息
 			
 			if (in.remaining() < totalLengthWithoutBody) {
@@ -45,43 +49,41 @@ public class StepProtocalDecoder extends CumulativeProtocolDecoder {
 			 * 8=FIXT.1.19=6935=A49=EzEI56=EzSR34=152=14281829347=GBK98=0108=20553=11111110=134
 			 */
 			byte[] beginLengthByte = new byte[ExpressConstant.BEGINSTRING_LENGTH_NOT_SPLIT];
-			try {
-				in.get(beginLengthByte);
-				while (!(ExpressConstant.BEGINSTRING.equals(new String(beginLengthByte)))) {
-					position = position + 1;
-					in.position(position);
-					in.get(beginLengthByte);
+			in.get(beginLengthByte);
+			
+			while (!(ExpressConstant.BEGINSTRING.equals(new String(beginLengthByte)))) {
+				position = position + 1;
+				in.position(position);
+				if (in.remaining() < totalLengthWithoutBody) {
+					break;
 				}
-			} catch (Exception e) {
-				log.error("get beginLengthByte exception:", e);
-			}			
+				in.get(beginLengthByte);
+			}
+
+			if (in.remaining() < afterBeginStrMinLength) {
+				in.position(position);
+				break;
+			}
 			
-			in.position(position);//移动position到"8=FIXT.1.1"之后
-			
+			in.position(position + ExpressConstant.BEGINSTRING_LENGTH_WITH_SPLIT);//移动position到"8=FIXT.1.1"之后
 			int bodyLengthByteLen = 0;	//表示"消息体长度"这个字段所占的长度
 			while (in.get() != 1 && bodyLengthByteLen <= ExpressConstant.MAX_BODYLENGTH) {//计算bodyLength占用的字节长度
 				bodyLengthByteLen++;
 			}
 			
 			//因为while循环中取出bodylength，此处重置position到"8=FIXT.1.1"之后
-			in.position(position);
+			in.position(position + ExpressConstant.BEGINSTRING_LENGTH_WITH_SPLIT);
 			byte[] bodyLengthByte = new byte[bodyLengthByteLen];
 			in.get(bodyLengthByte);//取得消息体长度的byte
-			int bodyLength;
-			try {
-				String bodyLenStr = new String(bodyLengthByte);//"9=69"
-				String bodyLenArr[] = bodyLenStr.split(ExpressConstant.REGION_VALU_SPLIT_STRING);
-				if (bodyLenArr.length == 2 && ExpressConstant.BODYLENGTH_REGION_STRING == Integer.parseInt(bodyLenArr[0])) {
-					bodyLength = Integer.parseInt(bodyLenArr[1]);	//消息体长度：69
-				} else {
-					in.position(position);
-					break;
-				}
-			} catch (Exception e) {
-				in.position(position);
-				log.error("get bodyLength exception:", e);
+			int bodyLength = 0;
+			String bodyLenStr = new String(bodyLengthByte);//"9=69"
+			String bodyLenArr[] = bodyLenStr.split(ExpressConstant.REGION_VALU_SPLIT_STRING);
+			if (bodyLenArr.length == 2 && ExpressConstant.BODYLENGTH_REGION_STRING == Integer.parseInt(bodyLenArr[0])) {
+				bodyLength = Integer.parseInt(bodyLenArr[1]);	//消息体长度：69
+			} else {
+				log.info("bodyLenStr is error: " + bodyLenStr);
 				break;
-			}			
+			}
 			
 			/**
 			 * 算出一条完整的step消息的总长度
@@ -92,7 +94,7 @@ public class StepProtocalDecoder extends CumulativeProtocolDecoder {
 			 * BODYEND_2_CHECKSUM_LENGTH："10=134"
 			 */
 			int totalLength = totalLengthWithoutBody + bodyLengthByteLen + + bodyLength;
-			in.position(position - ExpressConstant.BEGINSTRING_LENGTH_WITH_SPLIT);
+			in.position(position);
 			if (in.remaining() < totalLength) {//当前缓存中的数据没有一条完整的step
 				break;
 			}

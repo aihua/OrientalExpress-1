@@ -48,6 +48,8 @@ public class ExpressHandler extends IoHandlerAdapter {
 			log.debug("收到市场状态step：" + message.toString());
 			MarketStatus fme = (MarketStatus)message;
 			log.debug("收到行情的市场状态:" + fme.getTradingSessionID().getValue());
+		} else {
+			log.debug("收到其他消息：" + message.toString());
 		}
 
 	}

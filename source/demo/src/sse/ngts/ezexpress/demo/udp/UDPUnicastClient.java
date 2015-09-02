@@ -9,6 +9,7 @@
 package sse.ngts.ezexpress.demo.udp;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.apache.log4j.Logger;
@@ -30,27 +31,29 @@ public class UDPUnicastClient {
 	public static void main(String[] args) {
 		PropertyConfigurator.configure("cfg/log4j.properties");
 		//建立连接
-		ExpressConnector connect = ExpressApi.createClientConnector(new ExpressHandler(), EpsConnMode.EPS_CONN_MODE_UDP_UNICAST);
+		ExpressConnector connect = ExpressApi.createClientConnector(new ExpressHandler(), 
+				EpsConnMode.EPS_CONN_MODE_UDP_UNICAST);
 		try {
-			ExpressApi.connectClientConnector(connect, "127.0.0.1", 6661);//开启连接
+			ExpressApi.connectClientConnector(connect, 4002, "200.200.202.11");//开启连接
 		} catch (Exception e) {
-			log.info("无法连接到后台...", e);
+			log.error("connect exception", e);
 			return;
 		}
 
-		boolean isWhile = true;
-		while (isWhile) {
+		while (true) {
+			log.info("是否终止连接(true)：");
+			String input = null;
 			try {
-				String input = new BufferedReader(new InputStreamReader(System.in)).readLine();
-				if ("Logout".equalsIgnoreCase(input.trim())) {
-					//销毁接口
-					ExpressApi.destroyClientConnector(connect);
-					isWhile = false;
-				}
-			} catch (Exception e) {
-				log.error("Logout exception", e);
+				input = new BufferedReader(new InputStreamReader(System.in)).readLine();
+			} catch (IOException e) {
+				log.error("input exception", e);
+			}
+			if ("true".equals(input.trim())) {
+				ExpressApi.destroyClientConnector(connect);
+				break;
 			}
 		}
+		
 	}
 
 }

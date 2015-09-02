@@ -32,10 +32,12 @@ public class TCPClient {
 	public static void main(String[] args) {
 		PropertyConfigurator.configure("cfg/log4j.properties");
 		//建立连接
-		ExpressConnector connect = ExpressApi.createClientConnector(new ExpressHandler(), EpsConnMode.EPS_CONN_MODE_TCP);
+		ExpressConnector connect = ExpressApi.createClientConnector(new ExpressHandler(),
+				EpsConnMode.EPS_CONN_MODE_TCP);
 		try {
 			//开启连接
-			boolean connectSuc = ExpressApi.connectClientConnector(connect, "198.2.91.1", 9905);
+			boolean connectSuc = ExpressApi.connectClientConnector(connect, "180.2.24.1",
+					9005, "180.2.97.1");
 			if (!connectSuc) {
 				log.info("无法连接到后台");
 				return;
@@ -70,5 +72,6 @@ public class TCPClient {
 		}
 		
 	}
+	
 }
 

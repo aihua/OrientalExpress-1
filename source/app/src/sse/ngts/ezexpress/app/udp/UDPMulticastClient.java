@@ -42,27 +42,27 @@ public class UDPMulticastClient extends ClientConnector {
 		runThread.start();
 	}
 
-	@Override
-	public void connect(String host, int port) throws Exception {
-		connect(host, port, ExpressConstant.RECEIVE_TIMEOUT);
-	}
-
 	/**
 	 * 根据host和port新建一个UDP多播连接
 	 * @param host 绑定主机IP
 	 * @param port 连接端口
+	 * @param host 绑定本地IP
 	 * @param timeout 未收到数据超时时间/秒
 	 * @throws Exception 
 	 */
 	@Override
-	public void connect(String host, int port, int timeout) throws Exception {
-			InetAddress receiveAddress = InetAddress.getByName(host);
-			receiveMulticast = new MulticastSocket(port);
-			receiveMulticast.joinGroup(receiveAddress);
-			receiveMulticast.setSoTimeout(timeout * 1000);
-			receiveMulticast.setReceiveBufferSize(ExpressConstant.RECEIVE_BUFFERSIZE);
-			log.debug("超时时间：" + timeout + "秒");
-			runReceive();
+	public void connect(String host, int port, String localIP, int timeout) throws Exception {
+		InetAddress receiveAddress = InetAddress.getByName(host);
+		receiveMulticast = new MulticastSocket(port);
+		receiveMulticast.joinGroup(receiveAddress);
+		timeout = timeout < 0 ? ExpressConstant.RECEIVE_TIMEOUT : timeout;
+		receiveMulticast.setSoTimeout(timeout * 1000);
+		receiveMulticast.setReceiveBufferSize(ExpressConstant.RECEIVE_BUFFERSIZE);
+		if (null != localIP && !"".equals(localIP.trim())) {
+			receiveMulticast.setInterface(InetAddress.getByName(localIP));
+		}
+		log.debug("超时时间：" + timeout + "秒");
+		runReceive();
 	}
 
 	/**

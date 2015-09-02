@@ -3,15 +3,14 @@ package sse.ngts.ezexpress.app;
 public abstract class ClientAcceptor implements ExpressConnector {
 
 	/**
-	 * 创建输入host port地址
+	 * session绑定port
+	 * @param lcoalIP 绑定IP
+	 * @param port 绑定端口
+	 * @param timeout 接收行情数据超时时间/秒
 	 */
 	@Override
-	public void connect(String host, int port) throws Exception {
+	public void connect(String host, int port, String localIP, int timeout) throws Exception {
 
 	}
-
-	@Override
-	public void connect(String host, int port, int timeout) throws Exception {
-
-	}
+	
 }

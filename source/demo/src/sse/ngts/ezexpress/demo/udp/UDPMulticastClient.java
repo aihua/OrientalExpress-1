@@ -9,6 +9,7 @@
 package sse.ngts.ezexpress.demo.udp;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.apache.log4j.Logger;
@@ -29,21 +30,28 @@ public class UDPMulticastClient {
 	
 	public static void main(String[] args) {
 		PropertyConfigurator.configure("cfg/log4j.properties");
+		//建立连接
+		ExpressConnector connect = ExpressApi.createClientConnector(new ExpressHandler(), 
+				EpsConnMode.EPS_CONN_MODE_UDP_MULTICAST);
 		try {
-			//建立连接
-			ExpressConnector connect = ExpressApi.createClientConnector(new ExpressHandler(), EpsConnMode.EPS_CONN_MODE_UDP_MULTICAST);
-			connect.connect("225.225.225.0", 6661);//开启连接
-			
-			while (true) {
-				log.info("是否终止连接(true)：");
-				String input = new BufferedReader(new InputStreamReader(System.in)).readLine();
-				if ("true".equals(input.trim())) {
-					ExpressApi.destroyClientConnector(connect);
-					break;
-				}
-			}
+			//开启连接
+			ExpressApi.connectClientConnector(connect, "230.12.1.1", 3400, "58.24.13.1");
 		} catch (Exception e) {
-			log.error("Logout exception", e);
+			log.error("connect exception", e);
+		}
+		
+		while (true) {
+			log.info("是否终止连接(true)：");
+			String input = null;
+			try {
+				input = new BufferedReader(new InputStreamReader(System.in)).readLine();
+			} catch (IOException e) {
+				log.error("input exception", e);
+			}
+			if ("true".equals(input.trim())) {
+				ExpressApi.destroyClientConnector(connect);
+				break;
+			}
 		}
 		
 	}

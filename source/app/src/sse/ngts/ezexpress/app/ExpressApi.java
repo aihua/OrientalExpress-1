@@ -64,16 +64,9 @@ public class ExpressApi {
 	 * @return 成功/失败
 	 * @throws Exception 
 	 */
-	public static boolean connectClientConnector(ExpressConnector connector, String host, int port) throws Exception {
-		if (connector != null) {
-			if (connector instanceof ClientConnector) {
-				connector.connect(host, port);
-				return true;
-			} else if (connector instanceof ClientAcceptor) {
-				return connectClientConnector(connector, port);
-			}
-		}
-		return false;
+	public static boolean connectClientConnector(ExpressConnector connector, String host, int port)
+			throws Exception {
+		return connectClientConnector(connector, host, port, null, -1);
 	}
 	
 	/**
@@ -87,49 +80,93 @@ public class ExpressApi {
 	 */
 	public static boolean connectClientConnector(ExpressConnector connector, String host, 
 			int port, int timeout) throws Exception {
-		if (connector != null) {
-			if (connector instanceof ClientConnector) {
-				connector.connect(host, port, timeout);
-				return true;
-			} else if (connector instanceof ClientAcceptor) {
-				return connectClientConnector(connector, port, timeout);
-			}
-		}
-		return false;
+		return connectClientConnector(connector, host, port, null, timeout);
 	}
-
+	
 	/**
-	 *  开启连接 UDP单播
+	 *  开启连接  TCP连接和UDP组播
 	 * @param connector 连接实例
 	 * @param host 服务器地址
 	 * @param port 服务器端口
-	 * @return 成功/失败
+	 * @param localIP 本地地址
+	 * @return 成功/失败 
 	 * @throws Exception 
 	 */
-	public static boolean connectClientConnector(ExpressConnector connector, int port) throws Exception {
-		if (connector != null) {
-			if (connector instanceof ClientAcceptor) {
-				connector.connect(port);
-				return true;
-			}
-		}
-		return false;
+	public static boolean connectClientConnector(ExpressConnector connector, String host, 
+			int port, String localIP) throws Exception {
+		return connectClientConnector(connector, host, port, localIP, -1);
 	}
 	
 	/**
 	 *  开启连接 UDP单播
 	 * @param connector 连接实例
-	 * @param host 服务器地址
-	 * @param port 服务器端口
-	 * @param timeout 未收到数据超时时间/秒
+	 * @param localPort 本地端口
+	 * @param localIP 本地地址
 	 * @return 成功/失败
 	 * @throws Exception 
 	 */
-	public static boolean connectClientConnector(ExpressConnector connector, int port, int timeout)
+	public static boolean connectClientConnector(ExpressConnector connector, int localPort, String localIP)
 			throws Exception {
+		return connectClientConnector(connector, null, localPort, localIP, -1);
+	}
+	
+	/**
+	 *  开启连接 UDP单播
+	 * @param connector 连接实例
+	 * @param localPort 本地端口
+	 * @param localIP 本地地址
+	 * @param timeout 未收到数据超时时间/秒
+	 * @return 成功/失败 
+	 * @throws Exception 
+	 */
+	public static boolean connectClientConnector(ExpressConnector connector, int localPort, String localIP,
+			int timeout) throws Exception {
+		return connectClientConnector(connector, null, localPort, localIP, timeout);
+	}
+	
+	/**
+	 *  开启连接 UDP单播
+	 * @param connector 连接实例
+	 * @param localPort 本地端口
+	 * @return 成功/失败
+	 * @throws Exception 
+	 */
+	public static boolean connectClientConnector(ExpressConnector connector, int localPort)
+			throws Exception {
+		return connectClientConnector(connector, null, localPort, null, -1);
+	}
+	
+	/**
+	 *  开启连接 UDP单播
+	 * @param connector 连接实例
+	 * @param localPort 本地端口
+	 * @param timeout 未收到数据超时时间/秒
+	 * @return 成功/失败 
+	 * @throws Exception 
+	 */
+	public static boolean connectClientConnector(ExpressConnector connector, int localPort,
+			int timeout) throws Exception {
+		return connectClientConnector(connector, null, localPort, null, timeout);
+	}
+	
+	/**
+	 *  开启连接  TCP连接和UDP组播/单播
+	 * @param connector 连接实例
+	 * @param host 服务器地址
+	 * @param port 服务器端口
+	 * @param localIP 本地地址
+	 * @param timeout 未收到数据超时时间/秒
+	 * @return 成功/失败 
+	 * @throws Exception 
+	 */
+	public static boolean connectClientConnector(ExpressConnector connector, String host, 
+			int port, String localIP, int timeout) throws Exception {
 		if (connector != null) {
-			if (connector instanceof ClientAcceptor) {
-				connector.connect(port, timeout);
+			if (connector instanceof ClientConnector) {
+				connector.connect(host, port, localIP, timeout);
+				return true;
+			} else if (connector instanceof ClientAcceptor) {
+				connector.connect(localIP, port, timeout);
 				return true;
 			}
 		}

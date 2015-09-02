@@ -69,30 +69,29 @@ public class TCPClientConnector extends ClientConnector {
 		}
 	}
 
-	/**
-	 * 根据host和port新建一个IoSession连接
-	 * @param host 连接主机IP
-	 * @param port 连接端口
-	 */
-	public void connect(String host, int port) throws Exception {
-		connect(host, port, ExpressConstant.RECEIVE_TIMEOUT);
-	}
 
 	/**
 	 * 根据host和port新建一个IoSession连接
 	 * @param host 连接主机IP
 	 * @param port 连接端口
 	 * @param timeout 未收到数据超时时间/秒
+	 * @param localIP 本地绑定的IP
 	 */
 	@Override
-	public void connect(String host, int port, int timeout) throws Exception {
+	public void connect(String host, int port, String localIP, int timeout) throws Exception {
+		timeout = timeout < 0 ? ExpressConstant.RECEIVE_TIMEOUT : timeout;
 		connector.getSessionConfig().setIdleTime(IdleStatus.READER_IDLE, timeout);
 		log.debug("超时时间：" + timeout + "秒");
 		// 设置连接超时时间
 		connector.setConnectTimeoutMillis(ExpressConstant.CONNECT_TIMEOUT);  
-
+		
 		// 创建连接
-		ConnectFuture future = connector.connect(new InetSocketAddress(host, port));
+		ConnectFuture future = null;
+		if (null == localIP || "".equals(localIP.trim())) {
+			future = connector.connect(new InetSocketAddress(host, port));
+		} else {
+			future = connector.connect(new InetSocketAddress(host, port), new InetSocketAddress(localIP, 0));
+		}
 
 		// 等待连接创建完成
 		future.awaitUninterruptibly();
@@ -103,7 +102,7 @@ public class TCPClientConnector extends ClientConnector {
 		session.setAttribute(ExpressConstant.SESSION_LOCK, new LockExpress());
 		
 	}
-
+	
 	/**
 	 * 登录/登出是否成功
 	 * @return boolean
